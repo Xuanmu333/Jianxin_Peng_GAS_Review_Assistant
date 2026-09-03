@@ -1,0 +1,18 @@
+{
+  "name": "issue-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "跨平台本地项目 Review 助手",
+  "scripts": {
+    "start": "node server/server.js",
+    "check": "node --check server/server.js && node --check server/load-env.js && node --check server/review-store.js && node --check server/ai-service.js && node --check public/app.js && node --check public/model-data.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@material-symbols/font-400": "^0.45.10",
+    "gsap": "^3.13.0"
+  }
+}
