@@ -5,7 +5,6 @@ import http from 'node:http';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { generateAiQuestions } from './ai-service.js';
 import { createReviewStore } from './review-store.js';
 
 const serverDir = path.dirname(fileURLToPath(import.meta.url));
@@ -52,19 +51,6 @@ async function readJson(request) {
 }
 
 async function serveStatic(request, response, pathname) {
-  if (pathname === '/vendor/gsap.min.js') {
-    const gsapFile = path.join(projectDir, 'node_modules', 'gsap', 'dist', 'gsap.min.js');
-    const fileStat = await stat(gsapFile);
-    response.writeHead(200, {
-      'Content-Type': mimeTypes['.js'],
-      'Content-Length': fileStat.size,
-      'Cache-Control': 'public, max-age=86400',
-      'X-Content-Type-Options': 'nosniff'
-    });
-    if (request.method === 'HEAD') response.end();
-    else createReadStream(gsapFile).pipe(response);
-    return;
-  }
   if (pathname === '/vendor/material-symbols.css' || pathname === '/vendor/material-symbols-rounded.woff2') {
     const filename = pathname.endsWith('.css') ? 'rounded.css' : 'material-symbols-rounded.woff2';
     const assetFile = path.join(projectDir, 'node_modules', '@material-symbols', 'font-400', filename);
@@ -123,15 +109,6 @@ async function handleRequest(request, response) {
     const payload = await readJson(request);
     if (String(payload.reviewId || '') !== reviewId) throw Object.assign(new Error('URL 和数据中的 reviewId 不一致。'), { statusCode: 400 });
     sendJson(response, 200, await store.saveReview(payload));
-    return;
-  }
-  if (reviewMatch && request.method === 'DELETE') {
-    sendJson(response, 200, await store.deleteReview(decodeURIComponent(reviewMatch[1])));
-    return;
-  }
-  if (request.method === 'POST' && url.pathname === '/api/ai/questions') {
-    const body = await readJson(request);
-    sendJson(response, 200, await generateAiQuestions(body.context, body.config));
     return;
   }
   if (url.pathname.startsWith('/api/')) {

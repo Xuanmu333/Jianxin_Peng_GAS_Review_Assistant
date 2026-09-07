@@ -8,92 +8,61 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="app-header">
-    <div class="brand-lockup" aria-label="问题管理系统">
-      <div class="brand-name"><strong>问题管理系统</strong></div>
-      <span class="brand-line" aria-hidden="true"></span>
-    </div>
-    <div class="header-context">
-      <div class="project-context">
-        <select id="reviewProjectSelect" aria-label="选择 Review 项目"></select>
-      </div>
-      <span class="context-divider" aria-hidden="true"></span>
-      <label class="review-date-field" for="reviewDate"><span class="sr-only">Review 日期</span><input id="reviewDate" type="date"></label>
-    </div>
-    <div class="header-tools">
-      <div class="model-badge" id="modelBadge">正在读取模型…</div>
-      <button class="icon-button" id="openAiSettings" type="button" aria-label="AI 设置" title="AI 设置"><span class="material-symbols-rounded" aria-hidden="true">settings</span></button>
-      <button class="btn primary finish-button" id="finishReview"><span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>生成结果</button>
-    </div>
-  </header>
-
-  <div class="app-layout" id="appLayout">
-    <nav class="side-nav" id="sideNav" aria-label="主导航">
-      <div class="side-nav-menu">
-        <div class="nav-item active" aria-current="page"><span class="nav-icon material-symbols-rounded" aria-hidden="true">flare</span><span class="nav-text">Review 助手</span></div>
-      </div>
-
-      <button class="nav-collapse-bottom" type="button" id="navCollapseBottom"><span class="material-symbols-rounded" aria-hidden="true">keyboard_double_arrow_left</span><span>收起</span></button>
-    </nav>
-
-    <div class="app-main">
-      <div class="shell">
-        <div class="operation-progress hidden" id="operationProgress" role="status" aria-live="polite">
-          <div class="operation-progress-head"><strong id="operationProgressText">正在处理…</strong><span id="operationProgressPct">0%</span></div>
-          <div class="operation-progress-track"><span id="operationProgressBar"></span></div>
+  <main class="review-shell">
+    <aside class="queue-pane" aria-labelledby="queueTitle">
+      <header class="queue-header">
+        <div class="queue-heading">
+          <h1 id="queueTitle"><span class="material-symbols-rounded" aria-hidden="true">view_list</span>问题队列</h1>
+          <span id="reviewCount">0 个</span>
         </div>
-        <div id="serverBanner" class="server-banner hidden"></div>
+        <div class="queue-actions">
+          <button class="text-button" id="toggleNewIssue" type="button" aria-expanded="false" aria-controls="newIssuePanel">
+            <span class="material-symbols-rounded" aria-hidden="true">add</span>新增议题
+          </button>
+        </div>
+      </header>
 
-        <main class="app-content">
-          <section class="view" id="view1">
-            <div class="workspace">
-              <main class="pane question-workspace-pane">
-                <canvas id="kineticGridCanvas" class="kinetic-grid-canvas" aria-hidden="true"></canvas>
-                <div class="pane-body">
-                  <div class="empty" id="reviewEmpty">在右侧新增或选择一个议题，开始 Review。</div>
-                  <div id="activeReviewArea" class="hidden">
-                    <div class="issue-focus">
-                      <div class="issue-focus-top"><div class="eyebrow" id="focusMeta"></div></div>
-                      <div class="issue-title-row"><h2 id="focusTitle"></h2><div class="focus-actions"><button class="btn secondary small save-issue-version" id="saveIssueVersion" type="button"><span class="material-symbols-rounded" aria-hidden="true">save</span><span id="saveIssueVersionLabel">保存记录</span></button><button class="icon-button" id="editCurrentIssue" title="编辑议题" aria-label="编辑议题"><span class="material-symbols-rounded" aria-hidden="true">edit</span></button><button class="icon-button danger" id="deleteCurrentIssue" title="删除议题" aria-label="删除议题"><span class="material-symbols-rounded" aria-hidden="true">delete</span></button></div></div>
-                      <div class="last-saved-card" id="lastSavedCard" aria-live="polite"></div>
-                      <div class="review-meta-row"><span>Review 日期</span><strong id="focusReviewDate">—</strong><span class="material-symbols-rounded" aria-hidden="true">calendar_today</span></div>
-                    </div>
-                    <div class="ai-expand-bar"><div><strong>Review 问题库</strong><span id="questionProgress"></span></div><button class="btn ghost small" id="generateAiQuestions">AI 扩展问题</button></div>
-                    <div class="ai-status" id="aiStatus"></div>
-                    <div class="question-chain" id="questionChain"></div>
-                  </div>
-                </div>
-              </main>
+      <section class="new-issue-panel hidden" id="newIssuePanel" aria-label="新增议题">
+        <label for="newIssueText">议题描述</label>
+        <textarea id="newIssueText" rows="3" placeholder="简述议题（必填）"></textarea>
+        <div class="new-issue-fields">
+          <label for="newIssuePriority">严重程度
+            <select id="newIssuePriority">
+              <option value="" selected disabled>选择严重度</option>
+              <option value="S1">S1 · 高风险</option>
+              <option value="S2">S2 · 待关注</option>
+              <option value="S3">S3 · 一般</option>
+            </select>
+          </label>
+          <label for="newIssueCategory">分类
+            <select id="newIssueCategory"></select>
+          </label>
+        </div>
+        <button class="button primary full-width" id="addIssue" type="button">
+          <span class="material-symbols-rounded" aria-hidden="true">add</span>添加议题
+        </button>
+      </section>
 
-              <aside class="pane issue-capture-pane issue-queue-sidebar" id="issueQueuePane">
-                <div class="pane-head queue-head"><h3><span class="material-symbols-rounded" aria-hidden="true">view_list</span>问题队列</h3><span id="reviewCount" class="tag">0 个</span></div>
-                <details class="new-issue">
-                  <summary><span class="material-symbols-rounded" aria-hidden="true">add</span>新增议题</summary>
-                  <div class="new-issue-body">
-                    <label for="newIssueText">议题描述</label>
-                    <textarea id="newIssueText" placeholder="简述议题（必填）"></textarea>
-                    <div class="new-issue-fields">
-                      <label for="newIssuePriority"><span>严重程度</span><select id="newIssuePriority" aria-label="议题严重度"><option value="" selected disabled>选择严重度</option><option value="S1">S1 · 高风险</option><option value="S2">S2 · 待关注</option><option value="S3">S3 · 一般</option></select></label>
-                      <label class="category-field" for="newIssueCategory"><span>分类</span><span><select id="newIssueCategory" aria-label="问题分类"></select><button class="icon-action" type="button" id="manageIssueCategories" aria-label="管理分类" title="管理分类"><span class="material-symbols-rounded" aria-hidden="true">tune</span></button></span></label>
-                    </div>
-                    <button class="btn primary add-issue-button" id="addIssue"><span class="material-symbols-rounded" aria-hidden="true">add</span>添加议题</button>
-                  </div>
-                </details>
-                <section class="review-problem-list" aria-labelledby="reviewProblemListTitle">
-                  <div class="review-problem-list-head"><h4 id="reviewProblemListTitle">按风险排序</h4><span id="reviewProblemCount">0 个</span></div>
-                  <div class="review-problem-items" id="reviewProblemList"></div>
-                </section>
-              </aside>
-            </div>
-          </section>
-        </main>
+      <section class="queue-list" aria-labelledby="riskSortTitle">
+        <div class="queue-list-header">
+          <h2 id="riskSortTitle">按风险排序</h2>
+          <span id="reviewProblemCount">0 个</span>
+        </div>
+        <div class="queue-items" id="reviewProblemList"></div>
+      </section>
+    </aside>
+
+    <section class="question-workspace-pane" aria-label="Review 问题库">
+      <div id="serverBanner" class="server-banner hidden" role="status"></div>
+      <div class="workspace-content">
+        <div class="empty-state" id="reviewEmpty">请先从左侧问题队列中选择一个议题。</div>
+        <div id="activeReviewArea" class="active-review hidden">
+          <div class="question-chain" id="questionChain"></div>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
-  <div class="modal-backdrop hidden" id="aiSettingsModal" role="dialog" aria-modal="true" aria-labelledby="aiSettingsTitle"><div class="modal-card"><div class="modal-head"><div><h2 id="aiSettingsTitle">AI 设置</h2><p>用于根据你已选择并填写的问题扩展下一轮追问，只读取当前项目已录入的数据。</p></div><button class="icon-btn" id="closeAiSettings" aria-label="关闭">×</button></div><label for="aiEndpoint">API Endpoint</label><input id="aiEndpoint" placeholder="https://api.example.com/v1/chat/completions"><label for="aiModel">Model</label><input id="aiModel" placeholder="填写服务商提供的模型名称"><label for="aiApiKey">API Key</label><input id="aiApiKey" type="password" autocomplete="off" placeholder="仅保存在当前浏览器会话"><div class="notice">Endpoint 和 Model 保存在本浏览器；API Key 仅保存在当前标签页会话，不写入本地 Review 数据文件。</div><div class="actions modal-actions"><button class="btn neutral" id="clearAiSettings">清除设置</button><button class="btn primary" id="saveAiSettings">保存设置</button></div></div></div>
-  <div class="modal-backdrop hidden" id="categoryModal" role="dialog" aria-modal="true" aria-labelledby="categoryModalTitle"><div class="modal-card"><div class="modal-head"><div><h2 id="categoryModalTitle">管理问题分类</h2><p>分类用于 Review 录入和问题卡片，可随时新增、改名或删除。</p></div><button class="icon-btn" id="closeCategoryModal" aria-label="关闭">×</button></div><div class="category-add-row"><input id="newCategoryName" placeholder="输入新分类名称"><button class="btn primary" type="button" id="addIssueCategory">增加分类</button></div><div class="category-list" id="categoryList"></div></div></div>
-  <script src="/vendor/gsap.min.js"></script>
   <script src="/model-data.js"></script>
   <script src="/app.js"></script>
 </body>
