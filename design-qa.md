@@ -1,62 +1,48 @@
-# Design QA — Coordinated Light and Dark Themes
+# Design QA — Issues Management
 
-## Comparison target
+## Source visual truth
 
-- Source visual truth: `/var/folders/sv/gnv4f34n27sg8k8kq7g_t3dh0000gn/T/codex-clipboard-6801497f-5bbf-4c38-b0e7-303dedb8ebe2.png`
-- Light implementation: `qa/implementation-theme-light.png`
-- Dark implementation: `qa/implementation-theme-dark.png`
-- Combined comparison: `qa/reference-light-dark-comparison.png`
-- Browser viewport: 1280 × 720 CSS pixels, device density 1.
-- Source pixels: 3804 × 1880. The red-framed application region was cropped, scaled proportionally and padded to 1280 × 720 for comparison.
-- Implementation pixels: 1280 × 720 for both themes.
-- State: latest local Review, first issue active, all categories selected.
+- Selected login design: `/Users/xuanmu/.codex/generated_images/019fbdc4-9644-73e0-9784-f47289142816/exec-e86b6696-b41c-48a2-92da-b38c51980654.png`
+- Source pixels: 1488 × 1024.
+- Intended state: signed out, Google OAuth configured, desktop light theme.
+- Implementation: `http://127.0.0.1:4176/login.html`.
+- Browser-rendered evidence: Codex in-app Browser desktop capture, tab 4, 1280 × 720 CSS viewport at device scale 1. The viewport is shorter than the source; comparison used the shared above-the-fold region and focused controls rather than treating the lower crop as a defect.
 
-## Findings
+## Full-view comparison evidence
 
-- No actionable P0, P1 or P2 differences remain for the requested typography, two-theme and background-removal changes.
-- The surrounding Workspace application is contextual reference rather than code owned by this project, so the comparison focuses on typography scale, density and the red-framed application region.
+- Composition: the implementation preserves the source's 46/54 split, thin header, left authentication hierarchy, three-step flow, and right-side question-to-report preview.
+- Typography: SF Pro / PingFang system stack, display headline weight, compact enterprise body scale, and muted secondary text match the selected direction.
+- Spacing and rhythm: major gutters, horizontal divider, sign-in control height, and preview-card spacing follow the source. The implementation also collapses cleanly below 1100 px and hides the nonessential preview below 720 px.
+- Colors and tokens: white canvas, near-black text, cool gray rules, restrained `#087bfa` blue, and semantic green are consistent with the source.
+- Image quality and assets: the Google mark uses a real raster asset rather than a CSS or text approximation; product preview icons use the installed Material Symbols family.
+- Copy: login, access request, authorization steps, and workflow preview match the approved Chinese content and business purpose.
 
-## Required fidelity surfaces
+## Focused region comparison evidence
 
-- Fonts and typography: passed. The interface uses the macOS system stack with SF Pro Text / SF Pro Display and PingFang SC fallbacks. Body and interactive copy render at 14px / 20–21px, supporting text at 12–13px, and primary headings at 16px / 22–23px. This matches the surrounding Workspace density more closely than the previous 13px system.
-- Spacing and layout rhythm: passed. The issue rail is 300px at the 1280px target viewport, matching the source region proportion more closely and leaving the library/editor as the dominant workspace.
-- Colors and visual tokens: passed. Light page background computes to `rgb(255, 255, 255)` (`#ffffff`). Dark page background computes to `rgb(26, 26, 26)` (`#1a1a1a`). Borders, panels, inputs, hover and selected states all map through shared theme tokens.
-- Image quality and asset fidelity: passed. The source contains no required raster product assets inside the application region; Material Symbols remain the matching icon library.
-- Copy and content: passed. Existing issue/question copy is unchanged. The new theme control is icon-only with theme-specific accessible labels.
-- Accessibility: passed for desktop scope. The theme toggle has a semantic button, title and changing accessible label. Native focus states remain visible, contrast is maintained in both themes, and theme choice persists after reload.
-
-## Interaction verification
-
-- Light theme loads with a pure white application background.
-- Theme control switches to the dark theme with `#1a1a1a` as the main background.
-- Theme choice persists through page reload.
-- Dark theme switches back to light without changing content, layout or selected issue.
-- No Canvas elements remain in the DOM.
-- No GSAP or kinetic-grid references remain in HTML, CSS, JavaScript, server code or dependencies.
-- Existing queue, question filters and answer editor still render correctly.
-- Browser console errors: none.
-- `npm run check`: passed.
-- `git diff --check`: passed.
-
-## Focused comparison
-
-- Typography was checked in the queue title, queue card metadata/title, category headers, question rows, editor heading, helper copy, textarea and action labels.
-- Theme color was checked through browser-computed styles rather than screenshot sampling alone.
+- Google button: real Google mark, 2 px blue outline, centered 17 px label, 72 px control height, and calm hover/focus treatment.
+- Workflow board: three distinct stages remain readable at the desktop breakpoint; selected question has a restrained blue inset indicator and the saved answer has a semantic green state.
+- Administrator page: `http://127.0.0.1:4174/admin.html` was captured in the in-app Browser at 1280 × 720. Summary counts, status tabs, search, role selection, and approval actions follow the same visual tokens.
 
 ## Comparison history
 
-### Pass 1
+1. Initial browser capture found two P2 issues: the remote Google logo did not render, and the third workflow card clipped at the 1280 px verification viewport.
+2. Fixes: replaced the remote dependency with an embedded official Google raster asset; reduced the workflow grid minimum tracks and side padding.
+3. Post-fix capture confirmed the Google logo is visible and all three workflow stages fit without horizontal clipping.
 
-- [P2] The 360px issue rail occupied too much of the 1280px viewport compared with the red-framed source region.
+## Functional verification
 
-Fix:
+- Signed-out `/` and `/index.html`: redirect to `/login.html` for GET and HEAD.
+- Signed-out data API: returns HTTP 401.
+- Local administrator session: can open the workbench and `/admin.html`.
+- Access request lifecycle: pending → approved editor → rejected passed through the real HTTP APIs.
+- Admin list and counts: passed.
+- `npm run check`: passed.
+- `git diff --check`: passed.
+- No visible browser rendering errors in the inspected login and admin states.
 
-- Reduced the desktop rail to 300px and the narrower breakpoint rail to 280px.
+## Findings
 
-### Pass 2
-
-- The queue/library/editor proportions align with the source region.
-- Both themes preserve the same geometry and information hierarchy.
-- No actionable P0, P1 or P2 findings remain.
+- No actionable P0, P1, or P2 visual differences remain.
+- P3: the exact source was 1488 × 1024 while the in-app desktop capture surface was 1280 × 720; the implementation intentionally preserves responsive behavior rather than forcing source-sized content into the shorter viewport.
 
 final result: passed

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>授权审批 · Issues Management</title>
+  <link rel="stylesheet" href="/vendor/material-symbols.css">
+  <link rel="stylesheet" href="/auth.css">
+</head>
+<body class="admin-page">
+  <header class="admin-header">
+    <a class="auth-brand" href="/">Issues Management</a>
+    <div class="admin-actions">
+      <a class="back-link" href="/"><span class="material-symbols-rounded">arrow_back</span>返回工作台</a>
+      <button class="signout-button" id="signOut" type="button"><span class="material-symbols-rounded">logout</span>退出</button>
+    </div>
+  </header>
+  <main class="admin-shell">
+    <div class="admin-title-row">
+      <div><h1>授权审批</h1><p>审批 Google 账号对问题管理系统的查看或编辑权限。</p></div>
+      <span class="admin-identity" id="adminIdentity"></span>
+    </div>
+    <section class="admin-stats" aria-label="审批统计">
+      <article class="stat-card"><span>待审批</span><strong id="pendingCount">0</strong></article>
+      <article class="stat-card"><span>已授权</span><strong id="approvedCount">0</strong></article>
+      <article class="stat-card"><span>已拒绝</span><strong id="rejectedCount">0</strong></article>
+    </section>
+    <section>
+      <div class="admin-toolbar">
+        <div class="admin-tabs" role="tablist">
+          <button class="admin-tab active" type="button" data-status="pending">待审批</button>
+          <button class="admin-tab" type="button" data-status="approved">已授权</button>
+          <button class="admin-tab" type="button" data-status="rejected">已拒绝</button>
+          <button class="admin-tab" type="button" data-status="all">全部</button>
+        </div>
+        <label class="admin-search"><span class="material-symbols-rounded">search</span><input id="requestSearch" type="search" placeholder="搜索姓名、邮箱或部门"></label>
+      </div>
+      <div class="request-table">
+        <div class="request-head"><span>申请人</span><span>申请原因</span><span>状态</span><span>权限</span><span>操作</span></div>
+        <div id="requestRows"><div class="empty-requests">正在读取访问申请…</div></div>
+      </div>
+    </section>
+  </main>
+  <script src="/admin.js"></script>
+</body>
+</html>

@@ -139,6 +139,18 @@ export function createReviewStore({ dataDir, backupDir, maxBackups = 10 }) {
           historyCount: Array.isArray(stored.issueHistory) ? stored.issueHistory.length : 0
         };
       });
+    },
+
+    async deleteReview(reviewId) {
+      const id = String(reviewId || '').trim();
+      if (!id) throw Object.assign(new Error('reviewId 不能为空。'), { statusCode: 400 });
+      return queueWrite(async () => {
+        const database = await readDatabase();
+        if (!database.reviews[id]) throw Object.assign(new Error(`找不到项目记录：${id}`), { statusCode: 404 });
+        delete database.reviews[id];
+        await writeDatabase(database);
+        return { ok: true, reviewId: id };
+      });
     }
   };
 }

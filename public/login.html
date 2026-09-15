@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登录 · Issues Management</title>
+  <link rel="stylesheet" href="/vendor/material-symbols.css">
+  <link rel="stylesheet" href="/auth.css">
+</head>
+<body class="auth-page">
+  <header class="auth-header">
+    <a class="auth-brand" href="/login.html">Issues Management</a>
+    <span class="security-label"><span class="material-symbols-rounded">shield</span>安全访问</span>
+  </header>
+
+  <main class="login-layout">
+    <section class="login-column" aria-labelledby="loginTitle">
+      <div class="login-content">
+        <p class="auth-eyebrow">REVIEW WORKSPACE</p>
+        <h1 id="loginTitle">先登录，再开始提问</h1>
+        <p class="login-lead">连接你的 Google 账号，进入已获授权的项目与 Review 记录。</p>
+
+        <div class="auth-notice" id="authNotice" hidden role="status">
+          <span class="material-symbols-rounded" id="authNoticeIcon">info</span>
+          <div><strong id="authNoticeTitle"></strong><p id="authNoticeText"></p></div>
+        </div>
+
+        <a class="google-button" id="googleLogin" href="/auth/google">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAARfSURBVEhLtZZbTBRXHMb3qe9tY8vdRtAoIGLFSmFBG2pLkRLjg2haY0xrQh9IE0GrFNOmStXYSmIvKncwFG01FC+QKIhVEiDFhKS10Jpgd5Zw2Z1lZ3cue2GZr/9zhtsuW/pST/LlzOyc8/3O/5v/JGuSZXm7rusnVVX938V8TZqmVeIZDhMjsQtFURYky1A8Xqj0u+wQMXXnJmznTmDicBHGPz6AiWPFsF/4GlLvg/l1iqoGe5DYWAogc3VGp40eiPXfY/RdM4TUGAgboiBsjIXwahzNdJ8SCSHtFYztK4Czq8OAaNp/AJg5XbutFowd2AVL0ssQtsTDmp1kKCvR0KJ7YdNKWNZHYLKiDIrXS5UsQNhYADDzwAzcowJGd2bTCaMMk63JENITjAroxPyaVUFVWTPXwmpeBwtVY//uLBS/PyiqYABFomg+jB3cbZiTMQMwo9GCLMr8HJw93ZAe9WOqsx2TX5YZ5okrKMoLs+9hmYjYAseVGlhWR85HIKRGY6KsGPKUA9rsGlU3ZnYv9T2E+EOdYR6S/xKAokqQbsVh/IMXKIoNVEUsxksOGqaBgNFZIQasGbh5mA5iYmMeIAs34LptgrvLBNunz8Oakwq3xWJ01Ky5LCvQ/bRRJ9vlFDCAQQD370fhajXB1U6QDhOke+9DmabTLTqR36egrd+Fk9ec+KotvE5dd6LhngRNDQX8WgjXzwSgKtgsj1RSVwQD2OkONToRU2RD0iF7WMUX25HzhQinKxTQvzMEUAvFFwKYUVHe4kRyiR0Z5WJYbT4mIrfCgUmHHAJ4tJ8bSwRQaMbwcahhKiihCmI/snEIF5164xERmccNQNpREfmnHXA4QysYPgOJjKfpHTjbTGju2gvVSx2kLHSI16Ogb8iNH3tcaO011D7gwrftEjdmAAbbd97B1wYB5Il+6LdMEG4+h93N6XixJhf3R/qoI+iZstBFM3NdRHFx0RdR2ynx/BmAzZ9fdc4+WwSY9k7jQfcOpNVuRkzDLsTX5sB8ZS+eilYO0UK+Ug/dszH4xEvx2PFamVEBi61z0MVblY15gO7T0fF0EBHVOVjXkIvkpnysrHkDGS17cPvJffg0yovadk6apqB16C62VfyJTaUMIiLlsB17Kumrp2ceEhvzAHYqtvFU70WsuPg6EhvzOCS+7k0OKmgtQvnDSpzuq8Inv5zFO9c/RFytGWuqCpFe0YctR/xIKRXR89gd/kMzyvYgQFGVdp/BSwRZU/82khvzOWwVRRZdlY2oqizEVGdzcFLjDiRdzkFC/TasOtGApi6Kjd7PXIxLADKJRaH7ZvDNQBPWUlSRl8xYXfcWh3DDWSU25CGhbjsiLmVi/eU8tAz9RCf307taBjAn/gIprsfjf/E4MloKeQUx1VsRTaePpZmZZ199D5/1nMeIXeDr1UUeTP8KmJPupfahjTaJsv17ANf+6EDzbzfQOnwH/cIgplzUjvQ84JkOu58Dnu2/CuAfLuFy5kEETL8AAAAASUVORK5CYII=" alt="">
+          <span>使用 Google 账号继续</span>
+        </a>
+
+        <button class="access-link" id="requestAccess" type="button">申请访问权限<span class="material-symbols-rounded">arrow_forward</span></button>
+        <p class="permission-note">登录后将自动验证你的页面权限。</p>
+
+        <form class="access-form" id="accessForm" hidden>
+          <div class="form-heading">
+            <div><h2>申请访问</h2><p id="requestIdentity">先验证 Google 账号，再提交申请。</p></div>
+            <button class="icon-button" id="closeAccessForm" type="button" aria-label="关闭申请表单"><span class="material-symbols-rounded">close</span></button>
+          </div>
+          <label>部门 / 团队<input id="requestDepartment" maxlength="100" placeholder="例如：项目管理"></label>
+          <label>访问原因<textarea id="requestReason" maxlength="500" required placeholder="请简要说明需要查看或编辑哪些项目问题"></textarea></label>
+          <button class="submit-access" type="submit">提交审批</button>
+          <p class="form-status" id="requestStatus" role="status"></p>
+        </form>
+
+        <div class="login-steps" aria-label="登录步骤">
+          <div><span>1</span><strong>Google 登录</strong><small>使用你的 Google 账号完成登录</small></div>
+          <i class="material-symbols-rounded">arrow_forward</i>
+          <div><span>2</span><strong>验证授权</strong><small>自动验证项目访问权限</small></div>
+          <i class="material-symbols-rounded">arrow_forward</i>
+          <div><span>3</span><strong>进入工作台</strong><small>开始提问、记录回答并生成报告</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workflow-column" aria-label="问题管理流程预览">
+      <div class="workflow-content">
+        <h2>从问题到报告，更清晰的协作流程</h2>
+        <p>登录后，你可以在已获授权的项目中提问、记录回答，并生成完整的问题报告。</p>
+
+        <div class="workflow-board">
+          <article class="preview-card question-preview">
+            <h3>选择问题</h3>
+            <div class="preview-question"><span class="material-symbols-rounded">description</span><p>这是外部供应商的结论，还是内部团队已经独立确认的结论？</p><span class="material-symbols-rounded">chevron_right</span></div>
+            <div class="preview-question"><span class="material-symbols-rounded">description</span><p>内部哪位专业负责人对该结论负责？</p><span class="material-symbols-rounded">chevron_right</span></div>
+            <div class="preview-question selected"><span class="material-symbols-rounded">description</span><p>供应商提供的是口头判断、承诺、测试数据，还是实际结果？</p><span class="material-symbols-rounded">chevron_right</span></div>
+            <div class="preview-question"><span class="material-symbols-rounded">description</span><p>对方所说的“不能”具体是哪一种限制？</p><span class="material-symbols-rounded">chevron_right</span></div>
+          </article>
+          <span class="board-arrow material-symbols-rounded">arrow_forward</span>
+          <article class="preview-card answer-preview">
+            <h3>记录回答</h3>
+            <div class="selected-question">供应商提供的是口头判断、承诺、测试数据，还是实际结果？</div>
+            <div class="answer-note">供应商承诺下周完成整改。目前只收到整改计划，还没有验证报告。</div>
+            <span class="recorded"><span class="material-symbols-rounded">check_circle</span>已记录</span>
+          </article>
+          <span class="board-arrow material-symbols-rounded">arrow_forward</span>
+          <article class="preview-card report-preview">
+            <h3>形成报告</h3>
+            <div class="report-icon"><span class="material-symbols-rounded">summarize</span></div>
+            <strong>生成项目问题报告</strong>
+            <p>基于你的提问与回答，整理为结构化报告。</p>
+          </article>
+        </div>
+
+        <div class="workflow-benefits">
+          <div><span class="material-symbols-rounded">library_books</span><p><strong>聚焦关键问题</strong><small>从提问库快速找到适合的问法</small></p></div>
+          <div><span class="material-symbols-rounded">groups</span><p><strong>沉淀团队知识</strong><small>记录每一次讨论与结论</small></p></div>
+          <div><span class="material-symbols-rounded">query_stats</span><p><strong>提升决策效率</strong><small>从问题到报告形成闭环</small></p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="/auth.js"></script>
+</body>
+</html>

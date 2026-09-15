@@ -3,67 +3,96 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>问题管理系统</title>
+  <title>Issues Management</title>
   <link rel="stylesheet" href="/vendor/material-symbols.css">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <main class="review-shell">
-    <aside class="queue-pane" aria-labelledby="queueTitle">
-      <header class="queue-header">
-        <div class="queue-heading">
-          <h1 id="queueTitle"><span class="material-symbols-rounded" aria-hidden="true">view_list</span>问题队列</h1>
-          <span id="reviewCount">0 个</span>
-        </div>
-        <div class="queue-actions">
-          <button class="text-button" id="toggleNewIssue" type="button" aria-expanded="false" aria-controls="newIssuePanel">
-            <span class="material-symbols-rounded" aria-hidden="true">add</span>新增议题
-          </button>
-        </div>
-      </header>
+  <header class="app-header">
+    <a class="brand" href="#review">Issues Management</a>
+    <nav class="top-nav" aria-label="主要功能">
+      <button class="top-nav-item active" type="button" data-view="review">提问工作台</button>
+      <button class="top-nav-item" type="button" data-view="reports">项目问题与报告</button>
+    </nav>
+    <div class="header-actions">
+      <span class="sync-state" id="syncState"><i></i><span>正在连接</span></span>
+      <button class="icon-only theme-toggle" id="toggleTheme" type="button" aria-label="切换到深色模式"><span class="material-symbols-rounded">dark_mode</span></button>
+      <button class="icon-text-button" id="openAiSettings" type="button"><span class="material-symbols-rounded">settings</span>AI 设置</button>
+      <a class="icon-text-button admin-entry hidden" id="adminEntry" href="/admin.html"><span class="material-symbols-rounded">admin_panel_settings</span>授权审批</a>
+      <div class="account-control">
+        <span class="avatar" id="userAvatar" aria-hidden="true">U</span>
+        <span class="account-email" id="accountEmail"></span>
+        <button class="icon-only signout" id="signOut" type="button" aria-label="退出登录"><span class="material-symbols-rounded">logout</span></button>
+      </div>
+    </div>
+  </header>
+  <div class="app-message hidden" id="appMessage" role="status"></div>
 
-      <section class="new-issue-panel hidden" id="newIssuePanel" aria-label="新增议题">
-        <label for="newIssueText">议题描述</label>
-        <textarea id="newIssueText" rows="3" placeholder="简述议题（必填）"></textarea>
-        <div class="new-issue-fields">
-          <label for="newIssuePriority">严重程度
-            <select id="newIssuePriority">
-              <option value="" selected disabled>选择严重度</option>
-              <option value="S1">S1 · 高风险</option>
-              <option value="S2">S2 · 待关注</option>
-              <option value="S3">S3 · 一般</option>
-            </select>
-          </label>
-          <label for="newIssueCategory">分类
-            <select id="newIssueCategory"></select>
-          </label>
-        </div>
-        <button class="button primary full-width" id="addIssue" type="button">
-          <span class="material-symbols-rounded" aria-hidden="true">add</span>添加议题
-        </button>
+  <main class="view-shell" id="reviewView">
+    <aside class="context-sidebar">
+      <section class="sidebar-section">
+        <div class="section-label-row"><h2>当前项目</h2></div>
+        <select id="projectSelect" aria-label="选择项目"></select>
+        <button class="text-action" id="openProjectModal" type="button"><span class="material-symbols-rounded">add</span>新增项目</button>
       </section>
-
-      <section class="queue-list" aria-labelledby="riskSortTitle">
-        <div class="queue-list-header">
-          <h2 id="riskSortTitle">按风险排序</h2>
-          <span id="reviewProblemCount">0 个</span>
-        </div>
-        <div class="queue-items" id="reviewProblemList"></div>
+      <div class="sidebar-divider"></div>
+      <section class="sidebar-section issue-section">
+        <div class="section-label-row"><h2>正在 Review 的问题</h2><button class="icon-only" id="openIssueModal" type="button" aria-label="新增问题"><span class="material-symbols-rounded">add</span></button></div>
+        <div class="issue-list" id="issueList"></div>
       </section>
+      <p class="sidebar-foot">Google Sheets · 实时保存</p>
     </aside>
 
-    <section class="question-workspace-pane" aria-label="Review 问题库">
-      <div id="serverBanner" class="server-banner hidden" role="status"></div>
-      <div class="workspace-content">
-        <div class="empty-state" id="reviewEmpty">请先从左侧问题队列中选择一个议题。</div>
-        <div id="activeReviewArea" class="active-review hidden">
-          <div class="question-chain" id="questionChain"></div>
+    <section class="question-pane">
+      <div class="pane-heading">
+        <div>
+          <p class="breadcrumb" id="reviewBreadcrumb">请选择一个项目问题</p>
+          <h1>找到你想问的那句话</h1>
+          <p>从会议提炼的问法中选择，向团队提问后记录回答。</p>
+        </div>
+        <div class="ai-followup-action">
+          <button class="button outline" id="generateAiQuestions" type="button"><span class="material-symbols-rounded">auto_awesome</span>AI 深入追问</button>
+          <small>综合本问题全部已保存回答</small>
         </div>
       </div>
+      <label class="search-field"><span class="material-symbols-rounded">search</span><input id="questionSearch" type="search" placeholder="搜索提问、关键词或情境…"></label>
+      <div class="category-tabs" id="questionCategories"></div>
+      <div class="question-library-head" id="questionLibraryHead"></div>
+      <div class="question-list" id="questionList"></div>
+      <div class="question-guidance"><p>先用预设问题开展 Review，再让 AI 补充追问。</p><p>AI 综合全部已保存回答，对照提问库与已问内容去重。</p><small>自主选择，不必按顺序，也不必全部回答。</small></div>
     </section>
+
+    <div class="pane-resizer" id="answerPaneResizer" role="separator" aria-label="调整回答区域宽度" aria-orientation="vertical" aria-valuemin="340" aria-valuemax="720" tabindex="0"><span aria-hidden="true"></span></div>
+    <aside class="answer-pane">
+      <div class="answer-empty" id="answerEmpty"><span class="material-symbols-rounded">format_quote</span><h2>选择一句提问</h2><p>找到适合当前情境的问题，再记录团队的回答。</p></div>
+      <div class="answer-content hidden" id="answerContent">
+        <p class="eyebrow">回答记录</p><small>当前选中的提问</small><h2 id="selectedQuestionText"></h2>
+        <details class="question-help" open><summary><span class="material-symbols-rounded">lightbulb</span>为什么问 · 使用提示</summary><p id="questionHelpText">帮助把判断还原成可以核查的事实。</p></details>
+        <label class="field-label" for="answerText">团队回答 / 现场记录</label><textarea id="answerText" maxlength="3000" placeholder="记录事实、数字、判断或引用…"></textarea>
+        <div class="answer-meta"><span>记录来源：本次 Review</span><span id="answerCount">0 / 3000</span></div>
+        <button class="button primary save-answer" id="saveAnswer" type="button"><span class="material-symbols-rounded">check</span>保存回答</button>
+        <div class="answer-bottom"><button class="link-button" type="button" data-view="reports"><span class="material-symbols-rounded">description</span>查看本问题的记录与报告<span class="material-symbols-rounded">arrow_forward</span></button></div>
+      </div>
+    </aside>
   </main>
 
-  <script src="/model-data.js"></script>
-  <script src="/app.js"></script>
+  <main class="view-shell report-shell hidden" id="reportsView">
+    <aside class="project-sidebar">
+      <div class="section-label-row"><h2>项目</h2><button class="text-action compact" id="openProjectModalFromReports" type="button"><span class="material-symbols-rounded">add</span>新增项目</button></div>
+      <label class="search-field small"><span class="material-symbols-rounded">search</span><input id="projectSearch" type="search" placeholder="搜索项目"></label>
+      <div class="project-list" id="projectList"></div>
+    </aside>
+    <section class="report-list-pane">
+      <div class="report-list-head"><div><h1 id="reportProjectTitle">项目问题</h1><p id="reportProjectCount">0 个问题</p></div><button class="button primary compact" id="openIssueModalFromReports" type="button"><span class="material-symbols-rounded">add</span>新增问题</button></div>
+      <div class="report-filters"><label class="search-field small"><span class="material-symbols-rounded">search</span><input id="issueSearch" type="search" placeholder="搜索问题"></label><select id="issueCategoryFilter"><option value="all">全部分类</option></select><select id="issueStatusFilter"><option value="all">全部状态</option><option value="待确认">待确认</option><option value="跟进中">跟进中</option><option value="待验证">待验证</option><option value="已关闭">已关闭</option></select></div>
+      <div class="issue-table-head"><span>问题</span><span>分类</span><span>状态</span></div><div class="report-issue-list" id="reportIssueList"></div>
+    </section>
+    <article class="report-pane" id="reportPane"></article>
+  </main>
+
+  <div class="modal-backdrop hidden" id="projectModal"><form class="modal" id="projectForm"><div class="modal-head"><div><h2>新增项目</h2><p>项目会保存到 Issues 工作表。</p></div><button class="icon-only close-modal" type="button"><span class="material-symbols-rounded">close</span></button></div><label class="field-label" for="projectName">项目名称</label><input id="projectName" required maxlength="80" placeholder="例如 Zeus 项目"><div class="modal-actions"><button class="button neutral close-modal" type="button">取消</button><button class="button primary" type="submit">创建项目</button></div></form></div>
+  <div class="modal-backdrop hidden" id="issueModal"><form class="modal" id="issueForm"><div class="modal-head"><div><h2>新增项目问题</h2><p>先记录需要 Review 的真实项目问题。</p></div><button class="icon-only close-modal" type="button"><span class="material-symbols-rounded">close</span></button></div><label class="field-label" for="issueTitle">问题标题</label><input id="issueTitle" required maxlength="120" placeholder="例如 量产测试仍有 12% 样本失败"><label class="field-label" for="issueDescription">问题描述</label><textarea id="issueDescription" maxlength="1000" placeholder="补充当前已知情况（可选）"></textarea><div class="two-fields"><label><span class="field-label">问题分类</span><select id="issueCategory"></select></label><label><span class="field-label">严重程度</span><select id="issuePriority"><option value="S1">S1 · 高风险</option><option value="S2" selected>S2 · 待关注</option><option value="S3">S3 · 一般</option></select></label></div><button class="text-action" id="addCategoryInline" type="button"><span class="material-symbols-rounded">add</span>新增分类</button><div class="modal-actions"><button class="button neutral close-modal" type="button">取消</button><button class="button primary" type="submit">添加问题</button></div></form></div>
+  <div class="modal-backdrop hidden" id="aiSettingsModal"><form class="modal" id="aiSettingsForm"><div class="modal-head"><div><h2>AI 设置</h2><p>用于整轮 Review 后的去重追问和问题报告。</p></div><button class="icon-only close-modal" type="button"><span class="material-symbols-rounded">close</span></button></div><label class="field-label" for="aiEndpoint">API Endpoint</label><input id="aiEndpoint" type="url" placeholder="https://api.example.com/v1/chat/completions"><label class="field-label" for="aiModel">模型</label><input id="aiModel" placeholder="模型名称"><label class="field-label" for="aiApiKey">API Key</label><input id="aiApiKey" type="password" autocomplete="off" placeholder="仅保存在当前浏览器会话"><p class="form-note">Endpoint 和模型保存在本浏览器；API Key 仅保存在当前标签页，不写入 Google Sheets。</p><div class="modal-actions"><button class="button neutral" id="clearAiSettings" type="button">清除</button><button class="button primary" type="submit">保存设置</button></div></form></div>
+  <script src="/vendor/gsap.min.js"></script><script src="/model-data.js"></script><script src="/app.js"></script>
 </body>
 </html>
